@@ -98,9 +98,11 @@ public abstract class AlertPayActivity extends Activity {
 			//Login erfolgreich			
 			loginSuccess(response);			
 		}
-	
+	ffsfdsfsfdsfdsfsfsfsf
 	}
 	*/
+	
+	
 	
 	protected void loginSuccess(HashMap<String, String> response){
 	}
