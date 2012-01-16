@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sp_layout_paymentDetails"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/sp_txt_receiver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ViewStub
+        android:id="@+id/sp_stub_noitems"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout="@layout/ap_simple_payment_noitems" />
+
+    <LinearLayout
+        android:id="@+id/sp_layout_taxDetails"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginTop="10px"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/sp_txt_taxLabel"
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:text="Tax: " />
+
+        <TextView
+            android:id="@+id/sp_txt_tax"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50px" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/sp_layout_shippingDetails"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="15px"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/sp_txt_shippingLabel"
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:text="Shipping: " />
+
+        <TextView
+            android:id="@+id/sp_txt_shipping"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50px" />
+    </LinearLayout>
+
+    <include layout="@layout/ap_horizontal_line" />
+
+    <LinearLayout
+        android:id="@+id/sp_layout_shippingDetails"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="15px"
+        android:layout_marginTop="10px"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/sp_txt_payment_totallabel"
+            android:layout_width="200px"
+            android:layout_height="wrap_content"
+            android:text="Total: " />
+
+        <TextView
+            android:id="@+id/sp_txt_payment_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50px" />
+    </LinearLayout>
+    
+    <include layout="@layout/ap_horizontal_line" />
+
+</LinearLayout>
