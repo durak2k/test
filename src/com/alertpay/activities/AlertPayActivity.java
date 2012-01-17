@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 public abstract class AlertPayActivity extends Activity {
 	
+	// WURSTSALAT
 	
 	public static final String EXTRA_ERROR_TITLE = "ERROR_TITLE";
 	public static final String EXTRA_ERROR_MESSAGE = "ERROR_MESSAGE";
