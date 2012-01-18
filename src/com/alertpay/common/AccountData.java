@@ -2,6 +2,8 @@ package com.alertpay.common;
 
 import java.util.ArrayList;
 
+import com.alertpay.exceptions.PaymentInvalidException;
+
 public class AccountData {
 
 	private double tax = 0;
@@ -33,9 +35,33 @@ public class AccountData {
 	}
 	
 	
-	public double getTotal(){
+	public double getTaxShippingTotal(){
 		return this.tax+this.shipping;
 	}
+	
+	public double getItemsTotal(){
+		
+		double total = 0;
+		
+		for(int i=0; i<accountItems.size(); i++){
+			total = total + accountItems.get(i).getTotalPrice();
+		}
+		
+		return total;
+	}
+	
+	public void validate() throws PaymentInvalidException {
+		
+		if (this.getAccountItems().size() > 0) {
+			for (int i = 0; i < this.getAccountItems().size(); i++) {
+				AccountItem accItem = this.getAccountItems().get(i);
+				accItem.validate();
+			}
+
+		}
+	}
+	
+
 	
 	
 	

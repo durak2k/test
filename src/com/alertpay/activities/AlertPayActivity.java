@@ -10,9 +10,9 @@ import org.apache.http.message.BasicNameValuePair;
 
 import com.alertpay.R;
 import com.alertpay.common.AlertPay;
-import com.alertpay.common.ErrorDialog;
 import com.alertpay.common.ErrorMessage;
 import com.alertpay.transfer.ConnectionManager;
+import com.alertpay.views.ErrorDialog;
 
 import android.app.Activity;
 import android.app.AlertDialog;

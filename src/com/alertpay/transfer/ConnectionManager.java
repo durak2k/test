@@ -1,6 +1,7 @@
 package com.alertpay.transfer;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -101,12 +102,15 @@ public class ConnectionManager extends
 				throw new Exception("This is not a valid Response !");
 			}
 			
-		} catch (Exception e) {
+		} catch (IOException e) {
+			
 			this.errorMessage = "The Request could not be performed successfully !";
 			cancel(false);
 			
 			// TODO: handle exception
 
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 
 		return responseMap;

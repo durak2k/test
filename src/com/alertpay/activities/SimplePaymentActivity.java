@@ -14,10 +14,10 @@ import com.alertpay.callbacks.ApiRequestCallback;
 import com.alertpay.common.AccountData;
 import com.alertpay.common.AccountItem;
 import com.alertpay.common.AlertPay;
-import com.alertpay.common.ErrorDialog;
 import com.alertpay.common.ErrorMessage;
 import com.alertpay.common.SimplePayment;
 import com.alertpay.transfer.ConnectionManager;
+import com.alertpay.views.ErrorDialog;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -45,7 +45,7 @@ public class SimplePaymentActivity extends AlertPayActivity implements
 	private SimplePayment simplePayment;
 	private String serverSuffix = "sendmoney";
 	private AccountData accountData;
-	private ArrayList<AccountItem> accountItems;
+	private ArrayList<AccountItem> accountItems = new ArrayList<AccountItem>();
 	protected List<NameValuePair> paymentCredentials = new ArrayList<NameValuePair>();
 
 	// Views
@@ -72,7 +72,7 @@ public class SimplePaymentActivity extends AlertPayActivity implements
 				if (Arrays.binarySearch(alertPay.loginErrorCodes,
 						Integer.valueOf(response.get("RETURNCODE"))) >= 0) {
 					loginSuccess(response);
-					
+
 					username = "";
 					password = "";
 					// loginFailed(response);
@@ -110,11 +110,13 @@ public class SimplePaymentActivity extends AlertPayActivity implements
 
 		_simplePaymentActivity = this;
 
-		simplePayment = (SimplePayment) alertPay.getAlertPayComponent();
-		accountData = simplePayment.getAccountData();
-		accountItems = accountData.getAccountItems();
-
 		this.requestUrl = alertPay.getServer(serverSuffix);
+		simplePayment = (SimplePayment) alertPay.getAlertPayComponent();
+
+		if (simplePayment.getAccountData() != null) {
+			accountData = simplePayment.getAccountData();
+			accountItems = accountData.getAccountItems();
+		}
 
 		initializeViews();
 		registerListeners();
@@ -146,8 +148,12 @@ public class SimplePaymentActivity extends AlertPayActivity implements
 
 		// add button above login to toggle payment-details
 
+		paymentApprovalView = getLayoutInflater().inflate(
+				R.layout.ap_simple_payment_approval, null);
+		
 		paymentDetailsToggleView = getLayoutInflater().inflate(
 				R.layout.ap_simple_payment_details_button, null);
+		
 
 		int index = mainLayout.indexOfChild(loginView);
 
@@ -179,22 +185,34 @@ public class SimplePaymentActivity extends AlertPayActivity implements
 				.findViewById(R.id.sp_txt_receiver);
 		receiverView.setText(recipient);
 
+		
 		if (accountItems.size() > 0) {
 			showAccountItems();
 		} else {
 			showNoAccountItems();
 		}
 
-		TextView tax = (TextView) paymentDetailsView
-				.findViewById(R.id.sp_txt_tax);
-		tax.setText(Double.toString(accountData.getTax()) + " "
-				+ simplePayment.getCurrencyType());
+		TextView tax = (TextView) paymentDetailsView.findViewById(R.id.sp_txt_tax);
+		String taxString = (accountData == null) ? "0.0" : Double.toString(accountData.getTax());
 
+		tax.setText(taxString + " " + simplePayment.getCurrencyType());
+
+		/*
+		 * tax.setText(Double.toString(accountData.getTax()) + " " +
+		 * simplePayment.getCurrencyType());
+		 */
 		TextView shipping = (TextView) paymentDetailsView
 				.findViewById(R.id.sp_txt_shipping);
-		shipping.setText(Double.toString(accountData.getShipping()) + " "
-				+ simplePayment.getCurrencyType());
 
+		String shippingString = (accountData == null) ? "0.0" : Double
+				.toString(accountData.getShipping());
+		
+		shipping.setText(shippingString + " " +	simplePayment.getCurrencyType());
+		
+		/*
+		 * shipping.setText(Double.toString(accountData.getShipping()) + " " +
+		 * simplePayment.getCurrencyType());
+		 */
 		TextView total = (TextView) paymentDetailsView
 				.findViewById(R.id.sp_txt_payment_total);
 		total.setText(Double.toString(simplePayment.getTotal()) + " "
@@ -289,36 +307,44 @@ public class SimplePaymentActivity extends AlertPayActivity implements
 			} else {
 				mainLayout.removeView(paymentDetailsView);
 			}
+			
+			
+			
 		}
 
 		if (v == payButton) {
-			
+
 			this.paymentCredentials = createPaymentRequest();
-			
+
 		}
 
 	}
-	
+
 	protected List<NameValuePair> createPaymentRequest() {
 
 		List<NameValuePair> paymentCredentials = new ArrayList<NameValuePair>();
 		paymentCredentials.add(new BasicNameValuePair("USER", this.username));
-		paymentCredentials.add(new BasicNameValuePair("PASSWORD", this.password));
-		paymentCredentials.add(new BasicNameValuePair("AMOUNT", Double.toString(simplePayment.getTotal())));
-		paymentCredentials.add(new BasicNameValuePair("CURRENCY", simplePayment.getCurrencyType()));
-		paymentCredentials.add(new BasicNameValuePair("RECEIVEREMAIL", simplePayment.getRecipientEmail()));
-		paymentCredentials.add(new BasicNameValuePair("SENDEREMAIL", simplePayment.getSender()));
-		paymentCredentials.add(new BasicNameValuePair("PURCHASETYPE", Integer.toString(simplePayment.getPurchaseType())));
-		paymentCredentials.add(new BasicNameValuePair("NOTE", simplePayment.getNote()));
-		paymentCredentials.add(new BasicNameValuePair("TESTMODE", Integer.toString(alertPay.getMode())));
-		
+		paymentCredentials
+				.add(new BasicNameValuePair("PASSWORD", this.password));
+		paymentCredentials.add(new BasicNameValuePair("AMOUNT", Double
+				.toString(simplePayment.getTotal())));
+		paymentCredentials.add(new BasicNameValuePair("CURRENCY", simplePayment
+				.getCurrencyType()));
+		paymentCredentials.add(new BasicNameValuePair("RECEIVEREMAIL",
+				simplePayment.getRecipientEmail()));
+		paymentCredentials.add(new BasicNameValuePair("SENDEREMAIL",
+				simplePayment.getSender()));
+		paymentCredentials.add(new BasicNameValuePair("PURCHASETYPE", Integer
+				.toString(simplePayment.getPurchaseType())));
+		paymentCredentials.add(new BasicNameValuePair("NOTE", simplePayment
+				.getNote()));
+		paymentCredentials.add(new BasicNameValuePair("TESTMODE", Integer
+				.toString(alertPay.getMode())));
+
 		return paymentCredentials;
 	}
 
 	protected void loginSuccess(HashMap<String, String> response) {
-
-		paymentApprovalView = getLayoutInflater().inflate(
-				R.layout.ap_simple_payment_approval, null);
 
 		mainLayout.removeView(loginView);
 		mainLayout.addView(paymentApprovalView);

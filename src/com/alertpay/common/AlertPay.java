@@ -12,6 +12,9 @@ import com.alertpay.activities.AlertPayActivity;
 import com.alertpay.activities.MassPaymentActivity;
 import com.alertpay.activities.SimplePaymentActivity;
 import com.alertpay.activities.TestActivity;
+import com.alertpay.exceptions.ParameterInvalidException;
+import com.alertpay.exceptions.ParameterNotSetException;
+import com.alertpay.exceptions.PaymentInvalidException;
 
 public class AlertPay {
 	
@@ -21,7 +24,7 @@ public class AlertPay {
 	public static final int ENV_SANDBOX = 2;
 	public static final String SERVER_LIVE = "https://api.alertpay.com/svc/api.svc/";
 	public static final String SERVER_SANDBOX = "https://sandbox.alertpay.com/api/api.svc/";
-	public String[] currencyCodes = {"AUD","BGN","CAD","CHF","CZK","DKK","EEK","EUR","GBP","HKD",
+	public static String[] currencyCodes = {"AUD","BGN","CAD","CHF","CZK","DKK","EEK","EUR","GBP","HKD",
 			"HUF","INR","LTL","MYR","MKD","NOK","NZD","PLN","RON","SEK","SGD","USD","ZAR"};
 	public static final int PURCHASETYPE_SERVICE = 1;
 	public static final int PURCHASETYPE_GOODS = 2;
@@ -33,7 +36,7 @@ public class AlertPay {
 			223,224,225,226};
 	
 	private static AlertPay _alertPay;
-	private String server = SERVER_SANDBOX; 
+	private String server ; 
 	private int mode = 1;
 	private AlertPayComponent alertPayComponent;
 
@@ -45,12 +48,13 @@ public class AlertPay {
 	}
 	
 	public void setServer(int paramServer){
-		if(paramServer == Util.ENV_LIVE){
-			this.server = Util.SERVER_LIVE;
-		} else if (paramServer == Util.ENV_SANDBOX) {
-			this.server = Util.SERVER_SANDBOX;
+		if(paramServer == ENV_LIVE){
+			this.server = SERVER_LIVE;
+		} else if (paramServer == ENV_SANDBOX) {
+			this.server = SERVER_SANDBOX;
+		} else {
+			this.server = "";
 		}
-
 	}
 	
 	public void setMode(int mode){
@@ -70,19 +74,15 @@ public class AlertPay {
 	}
 	
 	
-	public void init(int paramServer, boolean testMode) {
-		if(paramServer == Util.ENV_LIVE){
-			this.server = Util.SERVER_LIVE;
-		} else if (paramServer == Util.ENV_SANDBOX) {
-			this.server = Util.SERVER_SANDBOX;
-		}	
-		
-		// SimplePaymentActivity.ge
 
-	}
-
-	public Intent checkout(AlertPayComponent alertPayComponent, Context context) {		
+	public Intent checkout(AlertPayComponent alertPayComponent, Context context) 
+			throws ParameterNotSetException, ParameterInvalidException, PaymentInvalidException{		
 		this.alertPayComponent = alertPayComponent;
+		
+		
+		this.validate();
+		alertPayComponent.validate();
+		
 		
 		Class alertPayClass = null;
 		
@@ -92,6 +92,8 @@ public class AlertPay {
 			alertPayClass = MassPaymentActivity.class;
 		} else if (alertPayComponent instanceof MassPayment) {
 			alertPayClass = MassPaymentActivity.class;
+		} else {
+			
 		}
 		
 		Intent i = new Intent(context, alertPayClass);	
@@ -99,25 +101,30 @@ public class AlertPay {
 		return i;
 	}
 	
-	public void validate() throws Exception {
-		
-		if(this.server != SERVER_LIVE && this.server != SERVER_SANDBOX){
-			
-		}
-		
-		
+	
+	private boolean checkServer(){
+		return (this.server.equals(SERVER_LIVE) || this.server.equals(SERVER_SANDBOX));
 	}
 	
-	public class Util{
-		public static final int ENV_LIVE = 1;
-		public static final int ENV_SANDBOX = 2;
-		public static final boolean testMode = false;
-		public static final String SERVER_LIVE = "https://api.alertpay.com/svc/api.svc/";
-		public static final String SERVER_SANDBOX = "https://sandbox.alertpay.com/api/api.svc/";
-		public String[] currencyCodes = {"AUD","BGN","CAD","CHF","CZK","DKK","EEK","EUR","GBP","HKD",
-				"HUF","INR","LTL","MYR","MKD","NOK","NZD","PLN","RON","SEK","SGD","USD","ZAR"};				
+	private boolean checkMode(){
+		return (this.mode == NORMAL_MODE || this.mode == TEST_MODE);
 	}
-
+	
+	public void validate() throws ParameterInvalidException, ParameterNotSetException{
+		
+		if(this.server == null){
+			throw new ParameterNotSetException("Server not specified !");
+		}
+		
+		if(!checkServer()){
+			throw new ParameterInvalidException("Server must be of type ENV_LIVE or ENV_SANDBOX !");
+		}
+		
+		if(!checkMode()){
+			throw new ParameterInvalidException("Mode must be of type TEST_MODE or NORMAL_MODE  !"); 
+		}	
+	}
+	
 
 
 }
